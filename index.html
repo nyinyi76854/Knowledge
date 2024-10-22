@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cloudy Messaging</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            padding: 20px;
+            text-align: center;
+        }
+
+        #messageBox {
+            width: 100%;
+            max-width: 400px;
+            padding: 10px;
+            font-size: 16px;
+            margin-bottom: 20px;
+        }
+
+        button {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        #output {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Cloudy Messaging App</h1>
+
+    <!-- Input field for message -->
+    <input type="text" id="messageBox" placeholder="Type your message here..." />
+
+    <!-- Send button -->
+    <button id="sendButton">Send</button>
+
+    <!-- Display output (last message and timestamp) -->
+    <div id="output"></div>
+
+    <script>
+        document.getElementById("sendButton").addEventListener("click", function() {
+            const message = document.getElementById("messageBox").value;
+            if (message) {
+                // Create payload
+                const data = {
+                    message: message,
+                    timestamp: new Date().toISOString()
+                };
+
+                // Make a POST request to submit the message
+                fetch('https://api.github.com/repos/<your-username>/<your-repo>/actions/workflows/python-backend.yml/dispatches', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': 'token YOUR_GITHUB_TOKEN',
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        ref: 'main',
+                        inputs: {
+                            message: data.message,
+                            timestamp: data.timestamp
+                        }
+                    })
+                })
+                .then(response => {
+                    if (response.ok) {
+                        document.getElementById("output").innerHTML = "Message sent: " + data.message + "<br>Timestamp: " + data.timestamp;
+                    } else {
+                        document.getElementById("output").innerHTML = "Failed to send message.";
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>
